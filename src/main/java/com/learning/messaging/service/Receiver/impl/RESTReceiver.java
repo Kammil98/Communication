@@ -1,6 +1,5 @@
 package com.learning.messaging.service.Receiver.impl;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.learning.messaging.model.Person;
 import com.learning.messaging.service.Receiver.MessageReceiver;
 import com.learning.messaging.service.Receiver.PersonReceiver;
@@ -25,7 +24,7 @@ public class RESTReceiver implements MessageReceiver, PersonReceiver {
     @GetMapping("/get-message")
     @ResponseStatus( HttpStatus.OK )
     @ResponseBody
-    public String receive(@RequestParam final String message) {
+    public String receiveAndReply(@RequestParam final String message) {
         logger.info("Received message: '{}'", message);
         return message;
     }
@@ -33,14 +32,18 @@ public class RESTReceiver implements MessageReceiver, PersonReceiver {
     @PostMapping("/get-message")
     @ResponseStatus( HttpStatus.OK )
     @ResponseBody
-    public Object receive(@RequestBody(required = true) final Person person) {
-        logger.info("Received object");
-        ObjectMapper objectMapper = new ObjectMapper();
-        logPerson(person);
+    public Person receiveAndReply(@RequestBody final Person person) {
+        receive(person);
         return person;
     }
 
-    private void logPerson(Person person) {
-        logger.info("Logging person: {}", person.toString());
+    @Override
+    public void receive(String message) {
+        throw new UnsupportedOperationException("Operation receive is not supported for REST");
+    }
+
+    @Override
+    public void receive(Person person) {
+        throw new UnsupportedOperationException("Operation receive is not supported for REST");
     }
 }

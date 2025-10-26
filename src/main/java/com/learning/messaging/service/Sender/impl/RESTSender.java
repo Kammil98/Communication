@@ -49,6 +49,9 @@ public class RESTSender implements MessageSender, PersonSender {
             logger.info("[{}]: {}", con.getRequestMethod(), url);
             logger.info("REST message {} sent with message '{}'", url, message);
             logger.info("Response code for {} is {}", url, con.getResponseCode());
+            if(con.getResponseCode() == HttpURLConnection.HTTP_OK) {
+                return true;
+            }
         } catch (IOException | URISyntaxException e) {
             logger.error("Could not send request with message '{}'", message);
         } finally {
@@ -56,7 +59,7 @@ public class RESTSender implements MessageSender, PersonSender {
                 con.disconnect();
             }
         }
-        return null;
+        return false;
     }
 
     @Override
@@ -79,12 +82,16 @@ public class RESTSender implements MessageSender, PersonSender {
             con.setRequestProperty("Accept", "application/json");
             con.setConnectTimeout(5000);
             con.setReadTimeout(5000);
+            con.setDoOutput(true);
 
             addBody(con, person);
             //logging
             logger.info("[{}]: {}", con.getRequestMethod(), url);
             logger.info("REST request {} sent with person {}", url, person);
             logger.info("Response code for {} is {}", url, con.getResponseCode());
+            if(con.getResponseCode() == HttpURLConnection.HTTP_OK) {
+                return true;
+            }
         } catch (IOException | URISyntaxException e) {
             logger.error("Could not send request with person {}", person);
         } finally {
@@ -92,14 +99,13 @@ public class RESTSender implements MessageSender, PersonSender {
                 con.disconnect();
             }
         }
-        return null;
+        return false;
     }
 
     private void addBody(HttpURLConnection con, Person person) {
         ObjectMapper objectMapper = new ObjectMapper();
         try (DataOutputStream out = new DataOutputStream(con.getOutputStream())) {
-            byte[] bytes = bytes = objectMapper.writeValueAsBytes(person);
-            con.setDoOutput(true);
+            byte[] bytes = objectMapper.writeValueAsBytes(person);
             out.write(bytes);
             out.flush();
         } catch (IOException e) {
