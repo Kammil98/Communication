@@ -12,7 +12,6 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Service;
 
 @Service
-@EnableRabbit
 @RabbitListener(queues = "${messaging.rabbitmq.queue.name}")
 public class RabbitMQReceiver implements MessageReceiver, PersonReceiver {
 
